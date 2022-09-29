@@ -83,15 +83,24 @@ class MyCameraActivity : AppCompatActivity() {
      override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
+
+            // this is the photo taken from the camera
             val photo = data?.extras!!["data"] as Bitmap?
             imageView!!.setImageBitmap(photo)
+
             if (photo != null) {
                 val image = InputImage.fromBitmap(photo, 0)
+
+                // here we are processing the image to detect objects
                 objectDetector.process(image)
                     .addOnSuccessListener { detectedObjects ->
+
+                        // loop through the detected objects
                         for (detectedObject in detectedObjects) {
                             val boundingBox = detectedObject.boundingBox
                             val trackingId = detectedObject.trackingId
+
+                            // loop through the labels for each detected object
                             for (label in detectedObject.labels) {
                                 val text = label.text
                                 
@@ -103,7 +112,7 @@ class MyCameraActivity : AppCompatActivity() {
                                     Log.i(TAG, "onActivityResult: Predefined cat for index label")
                                 }
                                 val confidence = label.confidence
-                                Log.i(TAG, "Confidence: $confidence")
+                                Log.i(TAG, "onActivityResult: $confidence")
                             }
                         }
                         Log.i(TAG, "onActivityResult: Object detected successfully")
